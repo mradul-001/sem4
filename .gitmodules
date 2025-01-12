@@ -1,0 +1,3 @@
+[submodule "CS236/osLabs"]
+	path = CS236/osLabs
+	url = https://github.com/mradul-001/osLabs
