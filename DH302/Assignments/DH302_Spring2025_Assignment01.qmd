@@ -1,0 +1,406 @@
+---
+title: "DH 302 Spring 2025 Assignment 01"
+subtitle: The assignment is based on [Lecture 2](https://docs.google.com/presentation/d/1uP3wnytME-H53D56LQ7RF0NJZnwSaEKwxoBSKCdLCqI/edit), [Lecture 3](https://docs.google.com/presentation/d/1_OKug6I4HMRxvgwlZGKEN-MpW0bHWYgtoe2neIg7g3c/edit#slide=id.g2ed5ab6ee26_0_369), [Lecture 4](https://docs.google.com/presentation/d/1mzbDiGV6-rxJuLg4RZjTfPpurh2A3N5-kaC8TByXwx0/edit#slide=id.g2ed5ab6ee26_0_369), [Lecture 5](https://docs.google.com/presentation/d/13Vd5upmBWfYEazYUjbFdfoj6tGHgv4UvCf2RDR9H2UI/edit#slide=id.g2ed5ab6ee26_0_369), and [Lecture 6](https://docs.google.com/presentation/d/1HaWCcW79TUA76U9csLvsDPsYFctk5p24OFaMAyilXKk/edit#slide=id.g2ed5ab6ee26_0_369). Due at 11:59PM (IST), Monday $3^{rd}$ February, 2025 via Gradescope. Total points = 100
+author: 
+  - "YOUR NAME HERE (YOUR ROLL NUMBER HERE)"
+  - "NAME AND ROLL NUMBERS OF YOUR COLLABORATOR(S) WITH Question(s)"
+  - "Example: Saket (09D02007): Q1,Q2,Q7"
+format: 
+  pdf:
+    fig-format: png
+    fig-dpi: 300
+    fig-width: 4
+    fig-height: 2.5
+editor: source
+---
+
+# Instructions
+
+Submit your solutions via [gradescope](https://www.gradescope.com/courses/946202) by 11:59 PM (IST) Monday, $3^{rd}$ February 2025. In-person submissions will not be entertained. Please upload a single PDF file. Late submissions are allowed with a 10% per day penalty. You can raise your questions related to the assignment on [Piazza](https://piazza.com/class/m5k3nf7l4e91cg/post/m6alu8nsltc1pq) - please tag these as `assignment_01`.
+
+-   For theory questions, you can either write your response for in latex or put a screenshot/picture of your handwritten response in the appropriate section. To embed scanned images, use this format: `![question1](/path/to/question1.png)` where `/path/to/question1.png` is the local path (on your laptop) to your scanned (handwritten) response to question1.
+-   If you are writing the solutions for theory questions by hand please use a pen. Pencil submissions are difficult to read when scanned. You will have to take a scan for each such answer and embed it in this document.
+-   Your final submission has to be the PDF that comes from this template - one single pdf. No Exceptions.
+-   Please mention the name(s) of people you collaborated with and what exactly you discussed.
+
+**Making your submission:** You can download the submission template from [here](https://drive.google.com/file/d/1n5uqXHucJJnYDbNI58_Q85uPsyxEqqEO/view?usp=sharing). Open the template in Rstudio (you will need to ensure Quarto is installed). Once you are done with your answers, use the "render" (arrow like) button on the toolbar to create a pdf. Only pdf submissions are allowed.
+
+```{r}
+#| echo: false
+#| message: false
+# !! DO NOT EDIT/REMOVE !!
+
+required.packages <- c("MASS", "tidyverse", "fitdistrplus")
+
+InstallMissing <- function(packages) {
+  for (pkg in packages) {
+    if (!require(pkg, character.only = TRUE)) {
+      install.packages(pkg, dependencies = TRUE)
+      library(pkg, character.only = TRUE)
+    }
+  }
+}
+
+InstallMissing(required.packages)
+
+library(tidyverse)
+library(MASS)
+library(fitdistrplus)
+```
+
+# Question 01 \[10 points\]
+
+**From L to LL to ML:** Let $X = (X_1, X_2, \dots, X_n)$ be independent and identically distributed (IID) observations coming from a poisson distribution with (unknown) parameter $\lambda$. Derive a likelihood estimate $\hat{lambda}$ for the $n$ observations.
+
+**Solution:**
+
+The Likelihood function for poisson distribution can be written as
+
+$$
+\begin{align*}
+L(\lambda) &= \prod_{i=1}^n \frac{\lambda^{X_i} e^{-\lambda}}{X_i!} \\ 
+\end{align*}
+$$
+
+We will use log likelihood function to calculate the value at which the likelihood function attains its maximum value.
+
+$$
+\begin{align*}log(L(\lambda)) &= \sum_{i=1}^n \frac{\lambda^{X_i} e^{-\lambda}}{X_i!} \\  &= \sum_{X_i}^n (X_i log(\lambda) - \lambda - log(X_i!) )\\   \end{align*}
+$$
+
+Now let us differentiate the log likelihood function to find the estimation $\hat{\lambda}$ of $\lambda$:
+
+$$
+\begin{align*}
+ \frac{d}{d\lambda} log(L(\lambda)) &= \frac{d}{d\lambda} \sum_{X_i}^n (X_i log(\lambda) - \lambda - log(X_i!) ) \\&= \sum_{i = 1}^n (\frac{X_i}{\lambda} - 1)
+\end{align*}
+$$
+
+Putting the derivative equal to $0$ gives us that:
+
+$$
+\begin{align*}
+\hat{\lambda} &= \sum_{i=1}^n \frac{X_i}{N}
+\end{align*}
+$$
+
+We can verify that this value is indeed correct by calculating the double derivative of log likelihood function at $\hat{\lambda}$, which comes out to be $-\frac{N^2}{\sum_{i=1}^nX_i}$. A negative value suggests that function attains it's maximum at $\hat{\lambda}$.
+
+# Question 02 \[10 points\]
+
+**Climbing the L landscape:** Simulating a poisson random variable in R is very easy. You can use the `rpois()` function to simulate. Write R code to define a function to output the log likelihood function of a poisson random variable. Additionally write R code to show the maximum likelihood estimate.
+
+**Solution:**
+
+```{r}
+logLikelihood <- function (dataVector, lambda) {
+  res <- 0
+  for (xi in dataVector) {
+    res <- res + xi * log(lambda) - lambda - log(factorial(xi))
+  }
+  return(res)
+}
+```
+
+The maximum likelihood estimate is just the mean of observed values.
+
+```{r}
+mleEstimate <- function (dataVector) {
+  res <- 0
+  for (xi in dataVector) {
+    res <- res + xi
+  }
+  return(res/length(dataVector))
+}
+```
+
+# Question 03 \[10 points\]
+
+**Limiting distributions magic:** The PMF of binomial random variable is given by $P(X=x) = {N \choose x} p^x (1-p)^{N-x})$. A poisson random variable on the other hand is given by $P(Y=y) = \lambda^y \frac{e^{-y}}{y!}$. In the class, we dervied a normal approximation to the poisson. Based on the below zoo of statistical models, it is possible to approximate a binomial model as a poisson. Write down the steps involved for arriving at this approximation.
+
+![Relationship between distributions. [Source](https://en.wikipedia.org/wiki/Relationships_among_probability_distributions)](~/github/DH302_assignments/Relationships_among_some_of_univariate_probability_distributions.jpg)
+
+**Solution:**
+
+Let us denote the PDF of Binomial Random Variable by $P(n,\theta,x)$. We know that the PDF can be expressed as follows:
+
+$$
+\begin{align*}
+P(n, \theta, x) &= \binom{n}{x}\theta^x (1-\theta)^{n-x}
+\end{align*}
+$$
+
+We will begin by assuming that $\theta = \frac{\lambda}{n}$. Replacing the value of $\theta$ gives us the following expression:
+
+$$
+\begin{align*}
+P(n, \frac{\lambda}{n}, x) &= \binom{n}{x} (\frac{\lambda}{n})^x (1 - \frac{\lambda}{n})^{n-x} \\
+&= (\frac{n!}{x!(n-x)!}) (\frac{\lambda^x}{n^x}) (1 - \frac{\lambda}{n})^n (1 - \frac{\lambda}{n})^{-x} \\
+&= (\frac{n(n-1)(n-2)\dots(n-x+1)}{x!}) (\frac{\lambda^x}{n^x}) (1-\frac{\lambda}{n})^n (1-\frac{\lambda}{n})^{-x} \\
+&= (\frac{\lambda^x}{x!}) [1 (1-\frac{1}{n})(1-\frac{2}{n}) \dots (1-\frac{x-1}{n})] (1-\frac{\lambda}{n})^n (1-\frac{\lambda}{n})^{-x} \\
+\end{align*}
+$$
+
+As the value of $n$ approaches $\infty$, the Binomial distribution tends to Poisson distribution. Let us calculate the limit of the above expression as $n$ approaches $\infty$.
+
+$$
+\begin{align*}
+Limit &= \lim_{n\to\infty} (\frac{\lambda^x}{x!}) [1 (1-\frac{1}{n})(1-\frac{2}{n}) \dots (1-\frac{x-1}{n})] (1-\frac{\lambda}{n})^n (1-\frac{\lambda}{n})^{-x}\\
+&= (\frac{\lambda^x}{x!}) ((1)(1)\dots(1)) e^{-\lambda} (1) \\
+&= (\frac{\lambda^x}{x!}) e^{-\lambda}
+\end{align*}
+$$
+
+Hence, the Binomial distribution can be approximated as Poisson if the value of $n$ is very large.
+
+# Question 04 \[30 points\]
+
+**Hirotogu's IC:**. Japanese statistician Hirotugu Akaike, formulated a criterion famously called the "Akaike Information Criterion (AIC)". AIC provides an estimate of the relative "quality of fit" of a model. Given a collection of models, AIC estimates the quality of each model relative to other models. A lower AIC value indicates better fit (think why).
+
+We did not get to cover this in class, but it is a relatively easy concept to understand. AIC is given by:
+
+$\mathrm {AIC} \,=\,2k-2\log({\hat {L}})$,
+
+where $k$= Estimated number of parameters and $\hat{L}$= Maximum likelihood of the model.
+
+Your goal in the problem is to estimate the best fit for modeling the number of deaths due to abortion in the year 2022. The data is available [here](https://www.dropbox.com/scl/fi/fjtw9njypvb4m2fgkul2s/India_abortion_deaths.tsv?rlkey=7yznndqwa8n57gw1677riz2kq&st=w62qrj4o&dl=0). The code below tries to simulate a poisson and then figures out the best model making use of the `fitdistrplus` package. It also shows how the predictions of the three models looks like and figures out the best model using the AIC.
+
+```{r}
+library(MASS)
+library(fitdistrplus)
+set.seed(42)
+simulated.X <- rpois(n = 1000, lambda = 10)
+
+df.x <- data.frame(x = simulated.X)
+ggplot(df.x, aes(x = x)) +
+  geom_histogram(aes(y = after_stat(!!str2lang("density"))), binwidth = 1, fill = "gray", color = "black") +
+  theme_minimal()
+```
+
+```{r}
+fit_norm <- fitdistr(simulated.X, 
+                     densfun = "normal")
+fit_poisson <- fitdistr(simulated.X, 
+                        densfun = "poisson")
+fit_gamma <- fitdistr(simulated.X, 
+                      densfun = "gamma")
+
+norm.pdf <- dnorm(simulated.X,
+  mean = fit_norm$estimate[["mean"]],
+  sd = fit_norm$estimate[["sd"]]
+)
+pois.pdf <- dpois(simulated.X,
+                  lambda = fit_poisson$estimate)
+gamma.pdf <- dgamma(simulated.X,
+                    shape = fit_gamma$estimate[["shape"]],
+                    rate = fit_gamma$estimate[["rate"]]
+)
+
+df.fit.norm <- data.frame(x = simulated.X,
+                          probability = norm.pdf)
+df.fit.pois <- data.frame(x = simulated.X, 
+                          probability = pois.pdf)
+df.fit.gamma <- data.frame(x = simulated.X, 
+                           probability = gamma.pdf)
+
+df.merged <- bind_rows(list(Normal = df.fit.norm,
+                            Poisson = df.fit.pois,
+                            Gamma = df.fit.gamma), 
+                       .id = "Type")
+
+
+ggplot(df.x, aes(x = x)) +
+ geom_histogram(aes(y = after_stat(!!str2lang("density"))), binwidth = 1, fill = "gray", color = "black") +
+  geom_point(data = df.merged, aes(x = x, y = probability, color = Type), size = 0.5) +
+  geom_line(data = df.merged, aes(x = x, y = probability, color = Type), linewidth = 0.5) +
+  theme_minimal()
+```
+
+```{r}
+aic_values <- c(
+  Normal = AIC(fit_norm),
+  Poisson = AIC(fit_poisson),
+  Gamma = AIC(fit_gamma)
+)
+aic_values
+```
+
+Now write code to show the best fit model among (only) poisson/normal/gamma for deaths due to abortion in 2009-2019 and then in 2019-2020. Since you need to write similar code for the two data frames, it might be worth writing a function to do this, something like:
+
+```{r}
+DoFit <- function(x) {
+  # Make your life easy by doing all standard operations
+  # for fitting in this function
+  # Fit normal
+  # fit poisson
+  # fit gamma
+  # plot <- ggplot2(df) + geom_( )... # you can store plots in variables in R
+  # aic <- AIC() ...
+  # return (list(plot=plot, aic=aic)) # return both the plot and the aic list and just display these in your answers
+}
+```
+
+```{r}
+df_abortions <- read_tsv("India_abortion_deaths.tsv")
+deaths_2009_2010 <- df_abortions %>% filter(year %in% c(2009, 2010))
+deaths_2019_2020 <- df_abortions %>% filter(year %in% c(2019, 2020))
+
+
+# YOUR CODE HERE
+fit_2009_2010 <- DoFit(deaths_2009_2010)
+fit_2019_2020 <- DoFit(deaths_2019_2020)
+```
+
+```{r}
+# !! DO NOT EDIT/REMOVE !!
+fit_2009_2010$plot
+```
+
+```{r}
+# !! DO NOT EDIT/REMOVE !!
+fit_2009_2010$aic
+```
+
+```{r}
+# !! DO NOT EDIT/REMOVE !!
+fit_2019_2020$plot
+```
+
+```{r}
+# !! DO NOT EDIT/REMOVE !!
+fit_2019_2020$aic
+```
+
+*What is the most appropriate model for fitting 2009-2010 deaths and for 2019-2020 deaths?*
+
+*YOUR RESPONSE HERE*
+
+# Question 05 \[20 points\]
+
+**You, the policy consultant:** The government is interested to know if the distribution of deaths across the twelve months has changed in 10 years from 2009 to 2019. Formulate a null hypothesis to provide recomeondation to the government. Also write R code to test your hypothesis at a p-value threshold of 0.01.
+
+A starter code to arrive at your data frame of interest is below:
+
+```{r}
+df_abortions <- read_tsv("India_abortion_deaths.tsv")
+deaths_2009 <- df_abortions %>% filter(year %in% c(2009))
+deaths_2019 <- df_abortions %>% filter(year %in% c(2019))
+df_2009_and_2019 <- bind_rows(list(deaths_2009, deaths_2019))
+df_wide <- pivot_wider(df_2009_and_2019 %>% dplyr::select(month, year, abortion_deaths), names_from = year, values_from = abortion_deaths)
+head(df_wide)
+
+# YOUR CODE HERE
+```
+
+# Question 06 \[10 points\]
+
+**Scale me away:** Given random variable $X \sim \mathcal{N}(0,1)$ and $Y$ poisson random variable with mean $\lambda = 5$, derive the the mean and variance of random variables $X'=4X$ and $Y'=5Y$. Write R code to draw the PMF of $X'$ and $Y'$ on For each random variable, your code should produce only one plot with different colors indicating $X$ and $X'$ in one plot and $Y$ and $Y'$ in other plot. Range of these random variables are different, use your best judgement to figure out what the x axis should be in each case.
+
+Here is a template for plotting geometric variable
+
+```{r}
+# Parameters
+set.seed(42)
+n <- 10 # Number of trials
+p <- 0.5 # Probability of success
+
+# Values of X
+x <- 0:n
+
+# PMF of X
+pmf_X <- dbinom(x, size = n, prob = p)
+
+# Values and PMF of 2X
+x_dash <- 2 * x
+pmf_dash <- pmf_X # In this case, scaling  does not change the parameter -- why?
+
+df1 <- data.frame(outcome = x, probability = pmf_X)
+df1$random_variable <- "X"
+
+df2 <- data.frame(outcome = x_dash, probability = pmf_dash)
+df2$random_variable <- "X'"
+
+df.combined <- bind_rows(list(df1, df2))
+
+ggplot(df.combined, aes(x = outcome, y = probability, color = random_variable)) +
+  geom_segment(aes(xend = outcome, yend = 0), linewidth = 1.2) + # Stems for PMF
+  geom_point(size = 2.5) + # Points at the top of stems
+  scale_color_brewer(palette = "Set1") +
+  labs(
+    title = "PMF comparison",
+    x = "Outcomes",
+    y = "Probability",
+    color = "Variable"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "top"
+  )
+```
+
+HINT: The continuous case of gaussian will require you to plot a PDF (not a PMF)
+
+```{r}
+mu <- 0
+sigma <- 1 # not sigma^2
+x <- seq(mu - 4 * sigma, mu + 4 * sigma, length.out = 1000)
+pdf <- dnorm(x, mean = mu, sd = sigma)
+
+df <- data.frame(observed = x, probability = pdf)
+ggplot(df, aes(x = observed, y = probability)) +
+  geom_line() +
+  labs(
+    title = "PDF comparison",
+    x = "x",
+    y = "Density",
+    color = "Variable"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "top"
+  )
+```
+
+```{r}
+# YOUR CODE AND PLOT HERE FOR GAUSSIAN
+```
+
+```{r}
+# YOUR CODE AND PLOT HERE FOR POISSON
+```
+
+# Question 07 \[10 points\]
+
+**Sherlocking the NEET fit:** National-eligibility-cum-entrance-test has been in the news (formerly known as All India Pre-medical test or AIPMT) is a nation wide entrance exam conducted by the National Testing Agency for admission into the undergraduate (MBBS) medical program throughout the country.
+
+NEET-UG-2024 was in the news even before the (original) results came out on June 4th. On 5th May 2024, the day of the exams, students complained of the paper having been leaked before the exam. NTA initially denied any leaks, but the Bihar police arrested a few peple involved with paper leaks in the next few days. [WikiPedia](https://en.wikipedia.org/wiki/2024_NEET_controversy) has a good summary of events:
+
+The matter ultimately reached the Supreme Court (SC). The SC ordered NTA to publish the entire center-wise records of the NEET-UG-2024 exam. NTA obliged, making the records available in PDF format [here](https://neet.ntaonline.in/frontend/web/common-scorecard/index).
+
+After painstakingly scraping 4750 PDFs (a potential assignment exercise for the future), the data is available for you in a simple format: CSV. For 2024, I was able to parse the data in a simple csv format for all the candidates who took the exam. For 2023, the raw data has not been published but I was able to parse out the relative frequency distribution using dome digitization tools (Which allow you to obtain raw data given a frequency/bar diagram).
+
+Use the file `NTA_all_marks_2024.csv` available [here](https://www.dropbox.com/scl/fi/bemtfvuljn9o7rujj2nz7/NTA_all_marks_2024.csv?rlkey=25xxhbyx1pyzoz3v9pj7dgsry&st=qu36bzxq&dl=0) to answer: What is the distribution (normal/non-normal/poisson/something else) for the marks obtained by students in 2024? A brief description of what the columns in each file represent:
+
+-   `Srlno:` Serial number of the candidate (unique for each center, but you should ideally not need this)
+-   `Marks:` Marks obtained in NEET-UG-2024 by the candidate
+-   `Center_number:` A unique center id (you do not need this for this analysis)
+
+Write R code to determine what is the best statistical model for modeling 2024 marks. Is it poisson, normal, log normal (not covered in class, but not hard to understand), poisson, gamma, or something else? Note that marks can be negative because of negative marking but you are allowed to add offsets as long as you declare them. You do not need to show the plot (it might be too slow for these many entries), but just the AIC values.
+
+```{r}
+df <- read_csv(file = "./NTA_all_marks_2024.csv")
+df <- df %>% filter(!is.na(Marks))
+```
+
+# Bonus question 08 \[15 points\]
+
+Now that you have finished the assignment, it's time for a bonus problem.
+
+While we do not have the exact scores since the data was extracted from the fig in the file `2023_2024_score_bins.csv` available [here](https://www.dropbox.com/scl/fi/6hh5cfxos521qki930n8j/NTA_2023_2024_score_bins.csv?rlkey=2wg6h8gqg5tgpyjm2nunsypjd&st=x3s4pdhu&dl=0). Here is description of the fields:
+
+-   `Score_bin`: the binned score bracket (these are comparable across 2023 and 2024)
+-   `frequency`: approximate number of students who obtained marks in a particular score bin
+
+If you had to give a verdict on whether or not cheating was widespread, how would you use the above data to come to any recommendation for the NTA?
