@@ -154,11 +154,11 @@ def astar_h1(
 
         currentState = heapq.heappop(openList)
 
-        if (
-            tuple(currentState.curValues) in closeList
-            and closeList[tuple(currentState.curValues)] <= currentState.gstar
-        ):
-            continue
+        # if (
+        #     tuple(currentState.curValues) in closeList
+        #     and closeList[tuple(currentState.curValues)] <= currentState.gstar
+        # ):
+        #     continue
 
         closeList[tuple(currentState.curValues)] = currentState.gstar
 
