@@ -229,12 +229,13 @@ implant.qqplot | control.qqplot
 
 #### **Answer:**
 
-We need to define the null and alternative hypothesis before performing the tests. This is because looking at the data before can unintentionally bias our hypothesis towards patterns
-observed in the sample.
-
- 
+We need to define the null and alternative hypothesis before performing the tests. This is because looking at the data before can unintentionally bias our hypothesis towards patterns observed in the sample.
 
 #### 3b. Suppose I reported t = 1.97 on 25 degrees of freedom and a P-value of 0.03. What is the proper P-value? \[5 points\]
+
+**Answer:**
+
+We should use a two-tailed test since alternative hypothesis was not pre-specified. Hence the true $p-value$ is $2×p-value(T≥1.97)$ = $0.06$.
 
 # Problem 04 \[25 points\]
 
@@ -252,13 +253,25 @@ n_rejections <- 0
 N_tries <- 10000
 n_sample_size <- 200
 
+for (i in 1 : N_tries) {
+  
+  s1 <- rnorm(n_sample_size, mean = 10, sd = 1)
+  s2 <- rnorm(n_sample_size, mean = 10, sd = 1)
+  test_stat <- t.test(s1, s2)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0511
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Since our significance level is 0.05, the probability of getting null hypothesis rejected should be around 0.05 only. Our above experiment confirms it, the rate of rejection is indeed close to 0.05.
 
 ### 4b. **Unequal variance**. Simulate two normal samples (n=100) with each mean = 10 and sd1 = 1 and sd2=2.5, 10000 times. Apply a t-test for each iteration and calculate the p-value. With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude and is that unusual? Use the default `t.test` \[2.5 points\]
 
@@ -276,14 +289,26 @@ mean2 <- mean1
 sd1 <- 1
 sd2 <- 2.5
 
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size, mean = 10, sd = 1)
+  s2 <- rnorm(n_sample_size, mean = 10, sd = 2.5)
+  test_stat <- t.test(s1, s2)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0519
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Even when we are not accounting for unequal variances, we are getting correct rejection rate. The reason is that for large and equal samples, Welch's test and the default t-test gives the same result.
 
 ### 4c. **Unequal variance revisited**: Repeat the example in 4b with now `var.equal=FALSE`:`t.test(var.equal=TRUE)`. With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
 
@@ -300,13 +325,26 @@ mean2 <- mean1
 
 sd1 <- 1
 sd2 <- 2.5
+
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size, mean = 10, sd = 1)
+  s2 <- rnorm(n_sample_size, mean = 10, sd = 2.5)
+  test_stat <- t.test(s1, s2, var.equal = FALSE)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0519
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Our observations are correct since Welch's test accounts for difference in variances.
 
 #### 4d. **Severe violation**: Following 4c, now set sd1=10, sd2=1, and use a non-welch t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
 
@@ -325,14 +363,26 @@ mean2 <- mean1
 sd1 <- 10
 sd2 <- 1
 
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size, mean = 10, sd = 1)
+  s2 <- rnorm(n_sample_size, mean = 10, sd = 2.5)
+  test_stat <- t.test(s1, s2, var.equal = TRUE)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0523
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Since the variances differ a lot, and the test we are doing here does not account for variance differences, we see a higher rejection rate of null hypothesis compared to $\alpha$.
 
 #### 4e. **Severe violation2**: Following 4d, now simulate different sample sizes with n_sample_size1 =30 and n_sample_size2=70, sd1=10, sd2=1, and use a non=welch t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
 
@@ -351,15 +401,27 @@ mean2 <- mean1
 sd1 <- 10
 sd2 <- 1
 
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size1, mean = mean1, sd = sd1)
+  s2 <- rnorm(n_sample_size2, mean = mean2, sd = sd2)
+  test_stat <- t.test(s1, s2, var.equal = TRUE)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.2068
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Here we have both unequal sized samples and unequal variances. Using a default t-test gives us an unusually high rejection rate, around 0.2. The default t-test fails badly on data with unequal means and variances.
 
-#### 4f. **Severe violation3**: Repeat 4e with n_sample_size1 = 70 and n_sample_size1=70, sd1=10, sd2=1, and use a non-welch t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
+#### 4f. **Severe violation3**: Repeat 4e with n_sample_size1 = 70 and n_sample_size2=30, sd1=10, sd2=1, and use a non-welch t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
 
 ```{r}
 # OUTPUT: n_rejects -- Number of rejections for alpha=0.05
@@ -376,9 +438,25 @@ mean2 <- mean1
 sd1 <- 10
 sd2 <- 1
 
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size1, mean = mean1, sd = sd1)
+  s2 <- rnorm(n_sample_size2, mean = mean2, sd = sd2)
+  test_stat <- t.test(s1, s2, var.equal = TRUE)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
+
+**n_rejections/N_tries:** 0.0043
+
+**Conclusion:** Which group (larger or smaller) has what variance (larger or smaller) is deciding the rejection rate. But in any case, the non-Welch t-test is failing and giving us wrong results.
 
 #### 4g. **Severe violation4**: Repeat 4f with n_sample_size1 = 70 and n_sample_size1=70, sd1=10, sd2=1, and use a Welch t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[2.5 points\]
 
@@ -420,16 +498,34 @@ For a n_sample_size1 = 70 and n_sample_size1=n_sample_size2=100, rate parameters
 
 ```{r}
 # OUTPUT: n_rejects -- Number of rejections for alpha=0.05
+
 set.seed(42)
+alpha <- 0.05
+n_rejections <- 0
+N_tries <- 10000
+n_sample_size1 <- 70
+n_sample_size2 <- 100
+rate1 <- 5
+rate2 <- 5
+
+for (i in 1:N_tries) {
+  s1 <- rexp(n_sample_size1, rate = rate1)
+  s2 <- rexp(n_sample_size2, rate = rate2)
+  p_value <- t.test(s1, s2)$p.value
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 
 # YOUR RESPONSE HERE
 
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0511
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Normality is indeed a relaxable condition, the rejection rate we get is still close to 0.05. t-test is robust to normality, given the sample sizes are sufficiently large.
 
 #### 4i. **Toss in exponential2**: Following 4h, repeat the experment with sample_size1=n_sample_size2=100, rate parameters r1=5 and r2=10 use a t-test to tabulate the number of times you reject the null? With $\alpha=0.05$, how many times do you reject the null hypothesis that the mean of two samples is equal? What do you conclude? \[5 points\]
 
@@ -437,9 +533,28 @@ n_rejections / N_tries
 # OUTPUT: n_rejects -- Number of rejections for alpha=0.05
 
 set.seed(42)
+alpha <- 0.05
+n_rejections <- 0
+N_tries <- 10000
+n_sample_size1 <- 100
+n_sample_size2 <- 100
+rate1 <- 5
+rate2 <- 10
+
+for (i in 1:N_tries) {
+  s1 <- rexp(n_sample_size1, rate = rate1)
+  s2 <- rexp(n_sample_size2, rate = rate2)
+  p_value <- t.test(s1, s2)$p.value
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
+
+**Conclusion:** This time the means are different, so we see a very high rejection rate. This means that although the data is not normally distributed, t-test works very well on it.
 
 # Problem 05 \[30 points\]
 
@@ -447,29 +562,62 @@ n_rejections / N_tries
 
 #### 5a. What is the null and alternative hypothesis? \[2.5 points\]
 
-YOUR RESPONSE HERE
+**Answer:**
+
+$H_0$: There is no difference in the grip strengths of adults after 6 weeks.
+
+$H_A$: The grip strength of adults decreased during the period of 6 weeks.
 
 #### 5b. Which test would you employ to test your hypothesis and why? \[2.5 points\]
 
-YOUR RESPONSE HERE
+**Answer:**
+
+We use a paired t-test because it compares the same subjects before and after 6 weeks. It is not a two group situation, we only have a single group and we are observing it at different times and want to comment on mean difference.
 
 #### 5c. If there are conditions to be satisfied for applying your test, write R code to output checks for validity of your test. \[5 points\]
 
 ```{r}
-# CODE for validity of your test of choice
-# INPUT: data frame of subject based grip strengths
-# OUTPUT: plots or metrics for assessing the validity of your test
+
+# Load necessary library
+library(ggplot2)
+
+data <- read.delim("./Assignment02_grip_strength.tsv")
+
+# difference in means
+data$diff <- data$baseline - data$measured_6weekslater
+
+# visualizing if the distribution of weight differences is normal
+ggplot(data, aes(x = diff)) +
+  geom_histogram(binwidth = 2, fill = "lightblue", 
+                 color = scales::alpha("black", 0.5)) +
+  ggtitle("Histogram of Differences") +
+  xlab("Difference (Baseline - 6 Weeks)") +
+  ylab("Frequency") +
+  theme
+```
+
+```{r}
+
+# plotting qq plot
+
+qqnorm(data$diff)
+qqline(data$diff, col = "green")
 ```
 
 #### 5d. Perform a test (using R) to test your hypothesis in a) reporting p-value and the conclusion. \[5 points\]
 
 ```{r}
 # CODE
+
+test_stat <- t.test(data$baseline, data$measured_6weekslater, 
+                        paired = TRUE, alternative = "greater")
+p_value <- test_stat$p.value
+print(p_value)
 ```
 
-**p-value:** YOUR RESPONSE HERE
+**p-value:** The p-value of the test is 0.9999999.
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** There is no evidence that grip strength decreased after 6 weeks from breaking their wrists.
 
 #### 5e. Non parameteric test \[5 points\]
 
@@ -477,25 +625,60 @@ A class of tests we did not discuss in detail in class are non-parameteric tests
 
 ```{r}
 # YOUR RESPONSE HERE
+test_stat <- wilcox.test(data$baseline, data$measured_6weekslater, 
+                                  paired = TRUE, alternative = "greater")
+p_value <- test_stat$p.value
+print(p_value)
 ```
+
+**Conclusion:** Since the data is paired and we are willing to perform a non-parametric test, we did Wilcoxon signed rank test as shown in the slides. The p-value is 1, this means that we have no evidence to reject the null hypothesis.
 
 #### 5f. Transform the original variable by a log() transformation and repeat your analysis in 5c and 5d \[10 points\]
 
 ```{r}
 # YOUR RESPONSE HERE
+
+# dataset has one entry as 0, i am makinng it 0.1, so as to compute log
+data$baseline[data$baseline == 0] <- 0.1
+data$measured_6weekslater[data$measured_6weekslater == 0] <- 0.1
+
+data$log_baseline <- log(data$baseline)
+data$log_measured_6weekslater <- log(data$measured_6weekslater)
+data$log_difference <- data$log_baseline - data$log_measured_6weekslater
+```
+
+```{r}
+
+ggplot(data, aes(x = log_difference)) +
+  geom_histogram(binwidth = 1, fill = "lightblue", 
+                 color = scales::alpha("black", 0.5)) +
+  ggtitle("Histogram of Differences") +
+  xlab("Difference (log(Baseline) - log(6 Weeks))") +
+  ylab("Frequency") +
+  theme
+```
+
+```{r}
+
+qqnorm(data$log_difference)
+qqline(data$log_difference, col = "green")
 ```
 
 ```{r}
 # YOUR CODE HERE
+test_stat <- t.test(data$log_baseline, data$log_measured_6weekslater, 
+                        paired = TRUE, alternative = "greater")
+p_value <- test_stat$p.value
+print(p_value)
 ```
 
-**p-value:** YOUR RESPONSE HERE
+**p-value:** 0.9999426
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** We still don't have any evidence to reject the null hypothesis.
 
 Question: how does the result of your analysis compare with your conclusion in d?
 
-YOUR RESPONSE HERE
+The p-value we got in d part is greater than what we got in this part. From the qq plot we can see that the data this time is more normal, and hence we can say that this normality made the test more accurate, resulting in slight decrement in the p-value.
 
 # Problem 06 \[50 points\]
 
