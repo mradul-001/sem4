@@ -697,17 +697,50 @@ Remember the dataset is messy, if you want to do dimensionality reduction, you w
 3.  `number_of_regions` = Number of sampling regions (this can be IGNORED for this question)
 4.  18 columns corresponding to the 18 out of 20 amino acids with absolute quantities for each
 
+print(df)
+
 ```{r}
 # YOUR CODE GOES HERE
 # OUTPUT: A reduced dimensional representation of your data
 # You can choose to color your data points on a specific variable of choice
 # the variable can either exist in data or can be extracted(appended) by
 # processing the data frame
-df <- read_tsv("Table8_amino_acid_profile_no_uncertainity.tsv")
+df <- read_tsv("./Table8_amino_acid_profile_no_uncertainity.tsv")
 df <- df %>%
   drop_na() %>%
   unique() %>%
   as.data.frame()
+
+```
+
+```{r}
+
+# we will reduce the dimension of data from 18 to 2, trying to keep variance
+# (information retention) as high as possible using PCA
+library(tidyverse)
+library(ggplot2)
+library(FactoMineR)
+library(factoextra)
+
+df_numeric <- df[, 4:21] 
+
+pca_result <- PCA(df_numeric, scale.unit = TRUE, graph = FALSE)
+
+fviz_pca_ind(pca_result, 
+             geom = "point",
+             addEllipses = TRUE, 
+             label = "none", 
+             title = "PCA of Amino Acid Profile of Foods",
+             pointsize = 3,
+             alpha.ind = 0.5,
+             col.ind = "steelblue",
+             repel = TRUE,
+) + 
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 14, face = "bold")) +
+  theme +
+  coord_cartesian(ylim = c(-8, 5))
+
 ```
 
 #### 6b. **The story** Do you notice any discernible pattern in your data? What are some factor(s) that explain your PC1 and PC2? \[10 points\]
