@@ -2,9 +2,7 @@
 title: "DH 302 Spring 2025 Assignment 02"
 subtitle: The assignment is based on [Lecture 7](https://docs.google.com/presentation/d/15kxh03hVBR1ybnuBBvbT5pfInju1IVkmVH1trWbKJn4/edit?usp=sharing), [Lecture 8](https://docs.google.com/presentation/d/1ilRr6T5N26kLWjIoP-ttUbXLsKxCW8SFx92DAf-R8zA/edit?usp=sharing), [Lecture 9](https://docs.google.com/presentation/d/1vc9WxkdTmCMudnAxxe6cFRUyRALaN0CQ8ixm3Np4IXU/edit?usp=sharing), and [Lecture 10](https://docs.google.com/presentation/d/1VT9ynRKMkdEBG9ysfBDhZR1c0DZ_UZ9Vvvzci22lbuw/edit?usp=sharing). Due at 11:59PM (IST), Tuesday $18^{th}$ February, 2025 via Gradescope. Raw template is available [here](https://drive.google.com/file/d/1RvXnFnPkDVPGGwllD187HW0MkutruZJv/view?usp=sharing) and an upto date version of this pdf is available [here](https://drive.google.com/file/d/1RvXnFnPkDVPGGwllD187HW0MkutruZJv/view?usp=sharing). Total points = 150
 author: 
-  - "YOUR NAME HERE (YOUR ROLL NUMBER HERE)"
-  - "NAME AND ROLL NUMBERS OF YOUR COLLABORATOR(S) WITH Question(s)"
-  - "Example: Saket (09D02007): Q1,Q2,Q7"
+  - "Mradul Sonkar (23B0980)"
 format: 
   pdf:
     fig-format: png
@@ -146,7 +144,7 @@ library(ggridges)
 df.breast$group <- "Breast"
 df.control$group <- "Control"
 
-df <- rbind(df.breast, df.contorl) # combining the dataframes for plotting
+df <- rbind(df.breast, df.control) # combining the dataframes for plotting
 ```
 
 ```{r}
@@ -474,13 +472,26 @@ mean2 <- mean1
 
 sd1 <- 10
 sd2 <- 1
+
+for (i in 1:N_tries) {
+  
+  s1 <- rnorm(n_sample_size1, mean = mean1, sd = sd1)
+  s2 <- rnorm(n_sample_size2, mean = mean2, sd = sd2)
+  test_stat <- t.test(s1, s2, var.equal = TRUE)
+  p_value <- test_stat$p.value
+  
+  if (p_value < alpha) {
+    n_rejections <- n_rejections + 1
+  }
+}
+
 # YOUR RESPONSE HERE
 n_rejections / N_tries
 ```
 
-**n_rejections/N_tries:** YOUR RESPONSE HERE
+**n_rejections/N_tries:** 0.0043
 
-**Conclusion:** YOUR RESPONSE HERE
+**Conclusion:** Which group (larger or smaller) has what variance (larger or smaller) is deciding the rejection rate. But in any case, the non-Welch t-test is failing and giving us wrong results.
 
 #### 4h. **Toss in exponential**: Hopefully you have got a feeling of what is happening. Now we take normality for a toss. I have mentioned multiple times in the class, it is a relaxable assumption, but is it really? \[2.5 points\]
 
@@ -678,7 +689,7 @@ print(p_value)
 
 Question: how does the result of your analysis compare with your conclusion in d?
 
-The p-value we got in d part is greater than what we got in this part. From the qq plot we can see that the data this time is more normal, and hence we can say that this normality made the test more accurate, resulting in slight decrement in the p-value.
+The p-value we got in (d) part is **greater** than what we got in this part. From the qq plot we can see that the data this time is **more normal**, and hence we can say that this normality made the test more accurate, resulting in slight decrement in the p-value.
 
 # Problem 06 \[50 points\]
 
@@ -696,8 +707,6 @@ Remember the dataset is messy, if you want to do dimensionality reduction, you w
 2.  `food_name` = long description of the food
 3.  `number_of_regions` = Number of sampling regions (this can be IGNORED for this question)
 4.  18 columns corresponding to the 18 out of 20 amino acids with absolute quantities for each
-
-print(df)
 
 ```{r}
 # YOUR CODE GOES HERE
@@ -723,24 +732,22 @@ library(FactoMineR)
 library(factoextra)
 
 df_numeric <- df[, 4:21] 
-
+df$food_category <- substr(df$food_code, 1, 1)
 pca_result <- PCA(df_numeric, scale.unit = TRUE, graph = FALSE)
 
-fviz_pca_ind(pca_result, 
+fviz_pca_ind(pca_result,
              geom = "point",
-             addEllipses = TRUE, 
-             label = "none", 
+             addEllipses = TRUE,
+             label = "none",
              title = "PCA of Amino Acid Profile of Foods",
              pointsize = 3,
              alpha.ind = 0.5,
              col.ind = "steelblue",
              repel = TRUE,
-) + 
-  theme_minimal() + 
+  ) +
+  theme_minimal() +
   theme(plot.title = element_text(size = 14, face = "bold")) +
-  theme +
   coord_cartesian(ylim = c(-8, 5))
-
 ```
 
 #### 6b. **The story** Do you notice any discernible pattern in your data? What are some factor(s) that explain your PC1 and PC2? \[10 points\]
@@ -748,14 +755,40 @@ fviz_pca_ind(pca_result,
 ```{r}
 # WRITE ADDITIONAL CODE TO EXPLAIN YOUR STORY
 #
+
+var_contrib <- get_pca_var(pca_result)
+fviz_pca_var(pca_result, col.var = "contrib", repel = TRUE) +
+scale_color_gradient2(low = "pink", mid = "violet", high = "blue", 
+                      midpoint = mean(var_contrib$contrib)) +
+  theme
 ```
+
+-   PC1 might be differentiating the food on the basis of their pH levels, since acidic amino acids are at one side of the axis and non-acidic are at the other side. Or the PC1 may be classifying the food basis of the total protein content. Low protein food is on the left side of the axis, while high protein food on the right side.
+
+-   PC2 may capture differences related to polarity and specific side chain properties. Hydrophobic amino acids are at the top, while more polar or structurally unique amino acids are at the bottom. PC2 may also be capturing differences in structural flexibility, highly flexible amino acids like glycine are at the lower side, while rigid amino acids like valine and leucine are at the upper side.
 
 ### 6c. **The factors** Identify the top 2 factors (features) that are associated with your PC1 and that with PC2. \[15 points\]
 
 ```{r}
 # WRITE ADDITIONAL CODE TO SHOW FACTORS ASSOCIATED WITH PC1 and PC2
 #
+
+var_contrib <- get_pca_var(pca_result)$contrib
+
+topPC1 <- var_contrib[order(-var_contrib[,1]), ][1:2, ]
+topPC2 <- var_contrib[order(-var_contrib[,2]), ][1:2, ]
+
+print("Top 2 features for PC1:")
+print(topPC1)
+cat("\n\n")
+print("Top 2 features for PC2:")
+print(topPC2)
+
 ```
+
+-   The amino acids contributing maximum towards PC1 are: **Methionine** and **Lysine**.
+
+-   The amino acids contributing maximum towards PC2 are: **Cystine** and **Alanine**.
 
 ### 6d. **Is it statistically significant?** Based on the topmost factor that you identified in 6c for PC1, perform a statistical test to test if this factor is statistically different between the two groups you identified in c. To define the two groups you can make use of the `code_desc` column (HINT: Individual food codes are not so useful but categories probably are) \[15 points\]
 
