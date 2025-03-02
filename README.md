@@ -1,1 +1,17 @@
 A repository corresponding to my sem 4 at IITB.
+
+- [CS217](./CS217/)
+    - [Slides](./CS217/Slides/)
+    - [Books](./CS217/Books/)
+- [CS218](./CS218/)
+    - [Slides](./CS218/Slides/)
+    - [Books](./CS218/Books/)
+- [CS219](./CS219/)
+    - [Slides](./CS219/Slides/)
+    - [Books](./CS219/Books/)
+- [CS236](./CS236/)
+- [CS240](./CS240/)
+- [DH302](./DH302/)
+    - [Slides](./DH302/Slides/)
+    - [Books](./DH302/Books/)
+    - [Assignment](./DH302/Assignments/)
