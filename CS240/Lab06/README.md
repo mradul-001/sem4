@@ -1,0 +1,1 @@
+This lab was ungraded. No new content was given to be solved.
