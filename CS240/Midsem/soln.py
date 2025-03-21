@@ -175,6 +175,9 @@ def test():
     print(" - Number of nodes expanded with h1:", a_star(startArr, "TD")[1])
     print(" - Number of nodes expanded with h2:", a_star(startArr, "DF")[1])
     print()
+    
+    return
+
 # ---------------------------------------------------------------------------
 
 test()
