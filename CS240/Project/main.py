@@ -1,4 +1,6 @@
-from dataHandler import DataLoaderAndSaver
+from src.dataHandler import DataLoaderAndSaver
+from src.model import StockPredictor
+
 
 dataloader = DataLoaderAndSaver()
 
@@ -9,3 +11,5 @@ dataloader.processAndSaveData("1d")
 # fetching "5m" data for "6m"
 dataloader.fetchAndSaveData("5m", "1mo")
 dataloader.processAndSaveData("5m")
+
+

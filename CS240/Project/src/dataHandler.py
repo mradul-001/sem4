@@ -1,4 +1,4 @@
-from processing import Processor
+from src.processing import Processor
 import yfinance as yf
 import pandas as pd
 import json
@@ -48,9 +48,9 @@ class DataLoaderAndSaver:
             processor.saveData(interval)
         return
     
-    def getProcessedData(self, tickerSymbol):
+    def getProcessedData(self, tickerSymbol, interval):
         """
         Return the processed data for the given stock as a dataframe
         """
-        data = pd.read_csv(f"{self.PROCESSEDDIRECTORY}/{tickerSymbol}.csv")
+        data = pd.read_csv(f"{self.PROCESSEDDIRECTORY}/{tickerSymbol}-{interval}.csv")
         return data
