@@ -1,3 +1,6 @@
 [submodule "CS236/osLabs"]
 	path = CS236/osLabs
 	url = https://github.com/mradul-001/osLabs
+[submodule "CS240/Project"]
+	path = CS240/Project
+	url = https://github.com/mradul-001/smPredictor.git
