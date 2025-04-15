@@ -1,0 +1,34 @@
+Results of running main.py file:
+================================
+----------------------------------------------------------------
+    cs240labendsem@sl3-4:~/Desktop/endsem$ python3 main.py 
+        SVM+FFNN Pipeline (Target 0) Test Accuracy: 96.67%
+        SVM+FFNN Pipeline (Target 1) Test Accuracy: 100.00%
+        SVM+FFNN Pipeline (Target 2) Test Accuracy: 93.33%
+        Standard NN Test Accuracy: 93.33%
+----------------------------------------------------------------
+
+Reason for the above results:
+
+- The classification pipeline implementation uses a mix of SVM and a Feed Forward neural Network.
+
+- My implementation works as follows:
+    - If the SVM is predicting that an example is indeed from the positive class ("svm_target"), take it as the final prediction.
+      That is, the answer predicted by the pipeline is the answer predicted by the SVM.
+    - But if the SVM predicts the example not to be from the positive class ("svm_target"), then we take the answer from the Neural Network
+      to be the final prediction.
+
+- This is the reason of the following accuracies, in most of the runs of the main.py, we can claim that:
+
+        (accuracy of the pipeline) >= (accuracy of the standalone NN)
+
+
+Model Arcitecture:
+==================
+
+- Number of hidden layers = 1
+- Number of neurons in hidden layer = 10
+- Number of epochs both the NN are trained on = 200
+- Learning rate of both the NN = 0.01
+
+The hyperparameters of both the model are the same, to ensure unbiasness. The difference is in what the models predict: one gives the predicted class, other gives the raw probabilities.

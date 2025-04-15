@@ -1,0 +1,148 @@
+\documentclass{report}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{letterspace}
+\usepackage{xcolor}
+\usepackage{pagecolor}
+\usepackage[a4paper, hmargin=1.2in, bottom=1.2in]{geometry}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{eso-pic}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usetikzlibrary{trees}
+\tikzstyle{every node}=[draw=gray, very thick, anchor=west]
+
+\lstdefinelanguage{bash}{
+    sensitive=true,
+    morekeywords={g++},
+    morecomment=[l]{\#},
+    morestring=[b]",
+}
+
+\lstset{
+    language=bash,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    columns=fullflexible,
+}
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum
+height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text
+centered, draw=black, fill=orange!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\setmainfont{Rajdhani}[BoldFont = Rajdhani Semibold]
+\definecolor{grey}{RGB}{40, 40, 40}
+\definecolor{section_color}{RGB}{0, 45, 98}
+\definecolor{subsection_color}{RGB}{0, 48, 143}
+\definecolor{subsubsection_color}{RGB}{0, 0, 255}
+\definecolor{text_color}{RGB}{50, 50, 50}
+\definecolor{bgcolor}{RGB}{240, 240, 240}
+
+\begin{document}
+
+\begin{titlepage}
+
+    \pagecolor{bgcolor}
+    \begin{center}
+
+        \includegraphics[width=0.7\textwidth]{/home/mradul/Pictures/globals/iitb_logo.png}
+
+        \vspace{100pt}
+
+        \makebox[\textwidth][c]{%
+            {\fontfamily{lmdh}\selectfont \fontsize{35}{45}\selectfont
+                    \textcolor{section_color}{\textls[40]{Assignment - 2}}}
+        }
+        \
+        \vspace{10pt}
+
+        \makebox[\textwidth][c]{{\selectfont \fontsize{17}{10}\selectfont
+                    \textcolor{grey}{{Design And Analysis of Algorithms}}}}
+
+        \vfill
+
+        {\fontsize{16}{30}\selectfont {\textcolor{grey}{Mradul Sonkar |
+                    23B0980}}}\
+        \vspace{5pt}
+        {\fontsize{16}{30}\selectfont {\textcolor{grey}{Instructor: Rohit
+                    Gurjar}}}
+
+    \end{center}
+
+\end{titlepage}
+
+\nopagecolor\
+
+\section*{Explanation:}
+ {\fontsize{12}{0} \selectfont
+
+  The code converts the constrained matrix problem into a flow network by
+  encoding
+  each cell, row, and column as a vertex in a graph. Each grid cell is
+  represented by two vertices: a
+  \textbf{cell-in} vertex and a \textbf{cell-out} vertex. The cell-in to
+  cell-out edge is given
+  a capacity equal to the difference between the cell's upper and lower bounds.
+  Besides, to impose the minimum flow requirement (i.e., the lower bound of the
+  cell), two auxiliary edges are inserted—one from the cell-in vertex to the
+  sink
+  with the same capacity as the lower bound and another from the source to the
+  cell-out vertex with the same capacity. We ensure that before any
+  other flow is taken into account, each cell has its minimum required flow.
+  \\[0.3cm]
+  For rows, there is a shared \textbf{row super source} and for each row there
+  is an
+  individual row-out vertex (with indices calculated using an offset off the
+  cell
+  vertices). An edge from the row super source to the row-out vertex is added
+  with capacity equal to the excess flow available (i.e., the upper bound minus
+  the lower bound), as well as extra edges that directly meet the lower bound
+  demands. Likewise, each column is represented by a \textbf{col-in} vertex
+  (placed
+  after the row vertices) and a common \textbf{column super sink} is employed.
+  Edges
+  between each column's col-in vertex and column super sink also fit in the
+  upper
+  minus lower bound difference, whereas additional edges ensure that the
+  required
+  minimum flow is forced through the columns. In order to combine these pieces,
+  the code links each row-out vertex to the cell-in vertices of the respective
+  cells in that row, and each cell-out vertex to the col-in vertex of the
+  respective column, via edges of infinite capacity. This allows the
+  correct propagation of flow from rows to cells to columns while
+  enforcing both cell bounds and row/column bounds.
+  \\[0.3cm]
+  Lastly, the algorithm runs in several phases. The initial phase applies the
+  compulsory (lower bound) flows and check if such a flow possible. In further
+  phases,
+  residual capacities—computed from unused quantities between upper and lower
+  bounds—are utilized to flow more. This, together with the
+  vertex representations given and the auxiliary edges, enables the network to
+  be
+  reconfigured and analyzed in turn through the Edmonds-Karp algorithm,
+  ensuring
+  that all cell, row, and column constraints are enforced within the optimal
+  final flow distribution.
+ }
+
+\section*{Usage:}
+\begin{lstlisting}[language=bash]
+    g++ 23B0980.cpp -o run
+    ./run < input*
+\end{lstlisting}
+
+\end{document}

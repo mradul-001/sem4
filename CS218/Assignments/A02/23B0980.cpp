@@ -1,124 +1,282 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int INF = 1e9;
+// function to add an edge in adj list
+void addEdge(int fromVertex, int toVertex, int edgeCapacity, vector<vector<int>> &capacityMatrix, vector<vector<int>> &adjacencyList)
+{
+    capacityMatrix[fromVertex][toVertex] += edgeCapacity;
+    adjacencyList[fromVertex].push_back(toVertex);
+    adjacencyList[toVertex].push_back(fromVertex);
+}
 
-struct Edge {
-    int v, capacity, flow, rev;
-};
+// function to run edmondskarp algo
+int edmondsKarp(int totalVertices, int sourceVertex, int sinkVertex, vector<vector<int>> &capacityMatrix,
+                vector<vector<int>> &adjacencyList, vector<vector<int>> &flowMatrix)
+{
+    flowMatrix.assign(totalVertices, vector<int>(totalVertices, 0));
+    int totalMaximumFlow = 0;
 
-class MaxFlow {
-    int nodes;
-    vector<vector<Edge>> adj;
-    vector<int> excess;
+    while (true)
+    {
+        vector<int> parentVertex(totalVertices, -1);
+        vector<int> edgeFlowFromSource(totalVertices, 0);
+        queue<int> bfsQueue;
 
-public:
-    MaxFlow(int n) : nodes(n), adj(n), excess(n, 0) {}
+        parentVertex[sourceVertex] = sourceVertex;
+        edgeFlowFromSource[sourceVertex] = INT_MAX;
+        bfsQueue.push(sourceVertex);
 
-    void addEdge(int u, int v, int lower, int upper) {
-        excess[u] -= lower;
-        excess[v] += lower;
-        Edge a = {v, upper - lower, 0, (int) adj[v].size()};
-        Edge b = {u, 0, 0, (int) adj[u].size()};
-        adj[u].push_back(a);
-        adj[v].push_back(b);
-    }
+        while (!bfsQueue.empty())
+        {
+            int currentVertex = bfsQueue.front();
+            bfsQueue.pop();
 
-    bool feasibleFlow(int s, int t, int &maxFlowValue) {
-        int total = 0;
-        for (int i = 0; i < nodes; i++) {
-            if (excess[i] > 0) {
-                addEdge(s, i, 0, excess[i]);
-                total += excess[i];
-            } else if (excess[i] < 0) {
-                addEdge(i, t, 0, -excess[i]);
-            }
-        }
-        int flow = maxFlow(s, t);
-        if (flow != total) return false;
-        maxFlowValue = maxFlow(s, t);
-        return true;
-    }
-
-    int bfs(int s, int t, vector<int>& parent) {
-        fill(parent.begin(), parent.end(), -1);
-        parent[s] = -2;
-        queue<pair<int, int>> q;
-        q.push({s, INF});
-        while (!q.empty()) {
-            int u = q.front().first, flow = q.front().second;
-            q.pop();
-            for (Edge &e : adj[u]) {
-                if (parent[e.v] == -1 && e.flow < e.capacity) {
-                    parent[e.v] = u;
-                    int new_flow = min(flow, e.capacity - e.flow);
-                    if (e.v == t) return new_flow;
-                    q.push({e.v, new_flow});
-                }
-            }
-        }
-        return 0;
-    }
-
-    int maxFlow(int s, int t) {
-        int flow = 0, new_flow;
-        vector<int> parent(nodes);
-        while ((new_flow = bfs(s, t, parent))) {
-            int v = t;
-            while (v != s) {
-                int u = parent[v];
-                for (Edge &e : adj[u]) {
-                    if (e.v == v) {
-                        e.flow += new_flow;
-                        adj[v][e.rev].flow -= new_flow;
+            for (int adjacentVertex : adjacencyList[currentVertex])
+            {
+                if (parentVertex[adjacentVertex] == -1 && capacityMatrix[currentVertex][adjacentVertex] - flowMatrix[currentVertex][adjacentVertex] > 0)
+                {
+                    parentVertex[adjacentVertex] = currentVertex;
+                    edgeFlowFromSource[adjacentVertex] = min(edgeFlowFromSource[currentVertex], capacityMatrix[currentVertex][adjacentVertex] - flowMatrix[currentVertex][adjacentVertex]);
+                    if (adjacentVertex == sinkVertex)
                         break;
-                    }
+                    bfsQueue.push(adjacentVertex);
                 }
-                v = u;
             }
-            flow += new_flow;
         }
-        return flow;
-    }
-};
 
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <input_file>" << endl;
-        return 1;
-    }
-    ifstream infile(argv[1]);
-    int m, n;
-    infile >> m >> n;
-    vector<vector<int>> l(m, vector<int>(n)), u(m, vector<int>(n));
-    vector<int> r(m), R(m), c(n), C(n);
+        if (parentVertex[sinkVertex] == -1)
+            break;
 
-    for (int i = 0; i < m; i++)
-        for (int j = 0; j < n; j++)
-            infile >> l[i][j];
-    for (int i = 0; i < m; i++)
-        for (int j = 0; j < n; j++)
-            infile >> u[i][j];
-    for (int i = 0; i < m; i++)
-        infile >> r[i] >> R[i];
-    for (int j = 0; j < n; j++)
-        infile >> c[j] >> C[j];
+        int pathFlow = edgeFlowFromSource[sinkVertex];
+        totalMaximumFlow += pathFlow;
+
+        int currentVertex = sinkVertex;
+        while (currentVertex != sourceVertex)
+        {
+            int previousVertex = parentVertex[currentVertex];
+            flowMatrix[previousVertex][currentVertex] += pathFlow;
+            flowMatrix[currentVertex][previousVertex] -= pathFlow;
+            currentVertex = previousVertex;
+        }
+    }
+
+    return totalMaximumFlow;
+}
+
+int main()
+{
+    // for faster IO
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int numRows, numCols;
+    cin >> numRows >> numCols;
+
+    vector<vector<int>> cellLowerBounds(numRows, vector<int>(numCols)), cellUpperBounds(numRows, vector<int>(numCols));
+    vector<int> rowLowerBounds(numRows), rowUpperBounds(numRows), colLowerBounds(numCols), colUpperBounds(numCols);
+
+    // take inputs
+    for (int i = 0; i < numRows; i++)
+        for (int j = 0; j < numCols; j++)
+            cin >> cellLowerBounds[i][j];
+
+    for (int i = 0; i < numRows; i++)
+        for (int j = 0; j < numCols; j++)
+            cin >> cellUpperBounds[i][j];
+
+    for (int i = 0; i < numRows; i++)
+        cin >> rowLowerBounds[i] >> rowUpperBounds[i];
+
+    for (int j = 0; j < numCols; j++)
+        cin >> colLowerBounds[j] >> colUpperBounds[j];
+
+    int totalVertices = 2 * numRows * numCols + numRows + numCols + 4;
+    int phase1Source = totalVertices - 2;
+    int phase1Sink = totalVertices - 1;
+    int rowSuperSourceVertex = 2 * numRows * numCols + numRows + numCols;
+    int columnSuperSinkVertex = rowSuperSourceVertex + 1;
     
-    int source = m + n, sink = m + n + 1;
-    MaxFlow graph(m + n + 2);
-    for (int i = 0; i < m; i++) graph.addEdge(source, i, r[i], R[i]);
-    for (int j = 0; j < n; j++) graph.addEdge(j + m, sink, c[j], C[j]);
-    for (int i = 0; i < m; i++)
-        for (int j = 0; j < n; j++)
-            graph.addEdge(i, j + m, l[i][j], u[i][j]);
-    
-    int max_budget;
-    if (!graph.feasibleFlow(source, sink, max_budget)) {
-        cout << "0\nnot possible" << endl;
+    vector<vector<int>> capacityMatrixPhase1(totalVertices, vector<int>(totalVertices, 0));
+    vector<vector<int>> adjacencyListPhase1(totalVertices);
+    int totalRequiredMinimumFlow = 0;
+
+    for (int i = 0; i < numRows; i++)
+    {
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            int cellOutVertex = cellInVertex + 1;
+
+            totalRequiredMinimumFlow += cellLowerBounds[i][j];
+            addEdge(cellInVertex, cellOutVertex, cellUpperBounds[i][j] - cellLowerBounds[i][j], capacityMatrixPhase1, adjacencyListPhase1);
+            addEdge(cellInVertex, phase1Sink, cellLowerBounds[i][j], capacityMatrixPhase1, adjacencyListPhase1);
+            addEdge(phase1Source, cellOutVertex, cellLowerBounds[i][j], capacityMatrixPhase1, adjacencyListPhase1);
+        }
+    }
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowInVertex = rowSuperSourceVertex;
+        int rowOutVertex = 2 * numRows * numCols + i;
+        totalRequiredMinimumFlow += rowLowerBounds[i];
+        addEdge(rowInVertex, rowOutVertex, rowUpperBounds[i] - rowLowerBounds[i], capacityMatrixPhase1, adjacencyListPhase1);
+        addEdge(rowInVertex, phase1Sink, rowLowerBounds[i], capacityMatrixPhase1, adjacencyListPhase1);
+        addEdge(phase1Source, rowOutVertex, rowLowerBounds[i], capacityMatrixPhase1, adjacencyListPhase1);
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        int colOutVertex = columnSuperSinkVertex;
+        totalRequiredMinimumFlow += colLowerBounds[j];
+        addEdge(colInVertex, colOutVertex, colUpperBounds[j] - colLowerBounds[j], capacityMatrixPhase1, adjacencyListPhase1);
+        addEdge(colInVertex, phase1Sink, colLowerBounds[j], capacityMatrixPhase1, adjacencyListPhase1);
+        addEdge(phase1Source, colOutVertex, colLowerBounds[j], capacityMatrixPhase1, adjacencyListPhase1);
+    }
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowOutVertex = 2 * numRows * numCols + i;
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            addEdge(rowOutVertex, cellInVertex, INT_MAX, capacityMatrixPhase1, adjacencyListPhase1);
+        }
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        for (int i = 0; i < numRows; i++)
+        {
+            int cellOutVertex = 2 * i * numCols + 2 * j + 1;
+            addEdge(cellOutVertex, colInVertex, INT_MAX, capacityMatrixPhase1, adjacencyListPhase1);
+        }
+    }
+
+    addEdge(columnSuperSinkVertex, rowSuperSourceVertex, INT_MAX, capacityMatrixPhase1, adjacencyListPhase1);
+
+    vector<vector<int>> flowMatrixPhase1;
+    int maxFlowPhase1 = edmondsKarp(totalVertices, phase1Source, phase1Sink, capacityMatrixPhase1, adjacencyListPhase1, flowMatrixPhase1);
+    if (totalRequiredMinimumFlow != maxFlowPhase1)
+    {
+        cout << 0 << "\n";
         return 0;
     }
-    
-    int min_budget = accumulate(r.begin(), r.end(), 0);
-    cout << "1\n" << min_budget << "\n" << max_budget << endl;
+    int preSatisfiedFlow = 0;
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowOutVertex = 2 * numRows * numCols + i;
+        preSatisfiedFlow += flowMatrixPhase1[rowSuperSourceVertex][rowOutVertex] + rowLowerBounds[i];
+    }
+    vector<vector<int>> capacityMatrixPhase2(totalVertices, vector<int>(totalVertices, 0));
+    vector<vector<int>> adjacencyListPhase2(totalVertices);
+
+    for (int i = 0; i < numRows; i++)
+    {
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            int cellOutVertex = cellInVertex + 1;
+            int usedFlow = flowMatrixPhase1[cellInVertex][cellOutVertex];
+            int remainingCapacity = usedFlow;
+            addEdge(cellInVertex, cellOutVertex, remainingCapacity, capacityMatrixPhase2, adjacencyListPhase2);
+        }
+    }
+
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowInVertex = rowSuperSourceVertex;
+        int rowOutVertex = 2 * numRows * numCols + i;
+        int usedFlow = flowMatrixPhase1[rowInVertex][rowOutVertex];
+        addEdge(rowInVertex, rowOutVertex, usedFlow, capacityMatrixPhase2, adjacencyListPhase2);
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        int colOutVertex = columnSuperSinkVertex;
+        int usedFlow = flowMatrixPhase1[colInVertex][colOutVertex];
+        addEdge(colInVertex, colOutVertex, usedFlow, capacityMatrixPhase2, adjacencyListPhase2);
+    }
+
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowOutVertex = 2 * numRows * numCols + i;
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            addEdge(rowOutVertex, cellInVertex, INT_MAX, capacityMatrixPhase2, adjacencyListPhase2);
+        }
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        for (int i = 0; i < numRows; i++)
+        {
+            int cellOutVertex = 2 * i * numCols + 2 * j + 1;
+            addEdge(cellOutVertex, colInVertex, INT_MAX, capacityMatrixPhase2, adjacencyListPhase2);
+        }
+    }
+    addEdge(columnSuperSinkVertex, rowSuperSourceVertex, INT_MAX, capacityMatrixPhase2, adjacencyListPhase2);
+
+    vector<vector<int>> flowMatrixPhase2;
+    int maxFlowPhase2 = edmondsKarp(totalVertices, rowSuperSourceVertex, columnSuperSinkVertex, capacityMatrixPhase2, adjacencyListPhase2, flowMatrixPhase2);
+    vector<vector<int>> capacityMatrixphase3(totalVertices, vector<int>(totalVertices, 0));
+    vector<vector<int>> adjacencyListphase3(totalVertices);
+
+    for (int i = 0; i < numRows; i++)
+    {
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            int cellOutVertex = cellInVertex + 1;
+            int usedFlow = flowMatrixPhase1[cellInVertex][cellOutVertex] - flowMatrixPhase2[cellInVertex][cellOutVertex];
+            int remainingCapacity = cellUpperBounds[i][j] - (cellLowerBounds[i][j] + usedFlow);
+            addEdge(cellInVertex, cellOutVertex, remainingCapacity, capacityMatrixphase3, adjacencyListphase3);
+        }
+    }
+
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowInVertex = rowSuperSourceVertex;
+        int rowOutVertex = 2 * numRows * numCols + i;
+        int usedFlow = flowMatrixPhase1[rowInVertex][rowOutVertex] - flowMatrixPhase2[rowInVertex][rowOutVertex];
+        addEdge(rowInVertex, rowOutVertex, rowUpperBounds[i] - (rowLowerBounds[i] + usedFlow), capacityMatrixphase3, adjacencyListphase3);
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        int colOutVertex = columnSuperSinkVertex;
+        int usedFlow = flowMatrixPhase1[colInVertex][colOutVertex] - flowMatrixPhase2[colInVertex][colOutVertex];
+        addEdge(colInVertex, colOutVertex, colUpperBounds[j] - (colLowerBounds[j] + usedFlow), capacityMatrixphase3, adjacencyListphase3);
+    }
+
+    for (int i = 0; i < numRows; i++)
+    {
+        int rowOutVertex = 2 * numRows * numCols + i;
+        for (int j = 0; j < numCols; j++)
+        {
+            int cellInVertex = 2 * i * numCols + 2 * j;
+            addEdge(rowOutVertex, cellInVertex, INT_MAX, capacityMatrixphase3, adjacencyListphase3);
+        }
+    }
+
+    for (int j = 0; j < numCols; j++)
+    {
+        int colInVertex = 2 * numRows * numCols + numRows + j;
+        for (int i = 0; i < numRows; i++)
+        {
+            int cellOutVertex = 2 * i * numCols + 2 * j + 1;
+            addEdge(cellOutVertex, colInVertex, INT_MAX, capacityMatrixphase3, adjacencyListphase3);
+        }
+    }
+    addEdge(columnSuperSinkVertex, rowSuperSourceVertex, INT_MAX, capacityMatrixphase3, adjacencyListphase3);
+    vector<vector<int>> flowMatrixphase3;
+    int maxFlowphase3 = edmondsKarp(totalVertices, rowSuperSourceVertex, columnSuperSinkVertex, capacityMatrixphase3, adjacencyListphase3, flowMatrixphase3);
+    cout << 1 << "\n";
+    cout << -maxFlowPhase2 + preSatisfiedFlow + maxFlowphase3 << endl;
+    cout << -maxFlowPhase2 + preSatisfiedFlow << "\n";
+
     return 0;
 }
