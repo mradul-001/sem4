@@ -1,0 +1,283 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{letterspace}
+\usepackage{xcolor}
+\usepackage{pagecolor}
+\usepackage[a4paper, hmargin=1in, bottom=1.2in]{geometry}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{eso-pic}
+\usepackage{tikz}
+\usepackage{enumitem}
+
+\setlist[itemize]{label=\fontsize{12pt}{12pt}\selectfont$\bullet$}
+
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum
+height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text
+centered, draw=black, fill=orange!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\setmainfont{Rajdhani}[BoldFont = Rajdhani Semibold]
+\definecolor{grey}{RGB}{40, 40, 40}
+\definecolor{section_color}{RGB}{0, 45, 98}
+\definecolor{subsection_color}{RGB}{0, 48, 143}
+\definecolor{subsubsection_color}{RGB}{0, 0, 255}
+\definecolor{text_color}{RGB}{50, 50, 50}
+\definecolor{bgcolor}{RGB}{240, 240, 240}
+
+\begin{document}
+
+\begin{titlepage}
+
+    \pagecolor{bgcolor}
+    \begin{center}
+
+        \includegraphics[width=0.7\textwidth]{/home/mradul/Pictures/globals/iitb_logo.png}
+
+        \vspace{100pt}
+
+        \makebox[\textwidth][c]{%
+            {\fontfamily{lmdh}\selectfont \fontsize{35}{45}\selectfont
+                    \textcolor{section_color}{\textls[40]{Individual
+                            Assignment}}}
+        }
+        \
+        \vspace{10pt}
+
+        \makebox[\textwidth][c]{{\selectfont \fontsize{17}{10}\selectfont
+                    \textcolor{grey}{{Introduction to Public Health
+                                Informatics}}}}
+
+        \vfill
+
+        {\fontsize{16}{30}\selectfont {\textcolor{grey}{Mradul Sonkar |
+                    23B0980}}}\\
+        \vspace{5pt}
+        {\fontsize{16}{30}\selectfont {\textcolor{grey}{Instructor: Nirmal
+                    Punjabi}}}
+
+    \end{center}
+
+\end{titlepage}
+
+\nopagecolor\
+
+\section*{Question 01}
+Department of Health of Maharashtra Government plans to expand its telemedicine
+services to underserved rural communities. Before proceeding, the director
+needs
+to conduct a comprehensive analysis to identify the best technique that could
+influence the implementation plan.
+\\\\
+\noindent \textbf{(A)} Which framework would be most appropriate for conducting
+this
+analysis
+(Select only one)? \\[0.2cm]
+\noindent PESTEL
+\\\\
+\noindent \textbf{(B)} Provide suitable justification to support the selection
+of answer. \\[0.2cm]
+\noindent
+PESTEL is best here because it looks at all the big things that can affect a
+government plan — like rules (legal), money (economic), people’s habits
+(social), and available technology. Since the health department wants to bring
+telemedicine to underserved villages, they need to think about these bigger
+outside
+factors. PESTEL helps them see the full picture before starting.
+
+\section*{Question 02}
+Consider the following hypothesis: "A school-based obesity prevention program
+will
+be successful if it reaches a high proportion of at-risk students, effectively
+reduces
+BMI, is adopted by multiple schools, is implemented with fidelity across
+different
+settings, and produces sustainable behavioural changes over time."
+\\\\
+\noindent \textbf{(A)} Which research framework does this hypothesis most
+closely align with? \\[0.2cm]
+\noindent RE-AIM
+\\\\
+\noindent \textbf{(B)} Provide suitable justification to support the selection
+of answer. \\[0.2cm]
+\noindent
+RE-AIM stands for Reach, Effectiveness, Adoption, Implementation, and
+Maintenance. The hypothesis talks about reaching many students, reducing BMI
+(effectiveness), being used in many schools (adoption), doing the program
+properly in different places (implementation), and keeping the changes for a
+long time (maintenance). This makes RE-AIM a good fit.
+
+\section*{Question 03}
+A public health department is planning a county-wide screening program for
+hypertension. Based on previous screening initiatives, they expect that
+approximately 30\% of adults in the county have hypertension (either diagnosed
+or undiagnosed). The department wants to estimate the true prevalence of
+hypertension with a margin of error of ±3 percentage points at a 95\%
+confidence
+level.
+\\\\
+\noindent \textbf{(A)} Which of the following best describes how the required
+sample size would
+change if the expected prevalence of hypertension was actually 20\% instead of
+30\% (keeping the same margin of error and confidence level)?\\[0.2cm]
+\noindent The required sample size would decrease.
+\\\\
+\noindent \textbf{(B)} Provide suitable justification to support the selection
+of answer. \\[0.2cm]
+\noindent
+Sample size depends partly on how close the expected percentage is to 50\%.
+When the expected prevalence is 30\%, it's closer to 50\% than 20\% is. Closer
+to 50\% means more variation, so we need a bigger sample. If the true value is
+actually 20\%, there’s less variation, so we don’t need as many people to get a
+good estimate — meaning a smaller sample size is enough.
+
+\section*{Question 04}
+In 1954, Dr. Jonas Salk led one of the largest medical field trials in history
+to test
+his inactivated polio vaccine. The trial included 1.8 million children, with
+approximately 440,000 receiving the vaccine, 210,000 receiving a placebo, and
+1.2 million serving as observed controls. Among the vaccinated group, 33 cases
+of polio were reported (0.0075\%), while the placebo group had 115 cases
+(0.055\%). A modern pharmaceutical company is developing a new vaccine for an
+emerging infectious disease with similar characteristics to polio. They plan to
+conduct clinical trials with the following parameters:
+\begin{itemize}
+    \item Estimated disease incidence in the population: 0.05\%
+    \item Estimated disease incidence in the population: 0.05\%
+    \item Planned trial size: 15,000 participants (7,500 vaccine, 7,500
+          placebo)
+    \item Trial duration: 6 months
+\end{itemize}
+Evaluate whether the planned sample size and trial duration are sufficient to
+justify the safety and efficacy of the new vaccine.
+\\\\
+
+\noindent \textbf{(A)} Calculate the expected number of cases in each group
+based on the given
+parameters. \\[0.2cm]
+\noindent Expected number of cases in Vaccine group = 0.05\% $\times$ (1 -
+0.85) $\times$
+7500 = 0.5625\\
+Expected number of cases in Placebo group = 0.05\% $\times$ 7500 =
+3.75\\[0.1cm]
+\noindent The disease incidence in case of vaccinated group reduced by a factor
+of 0.15
+because of the efficacy of the vaccine.
+\\\\
+\noindent \textbf{(B)} Discuss at least two statistical and ethical
+considerations related to
+sample size adequacy for establishing vaccine safety. \\[0.2cm]
+\textbf{1. Too few cases expected:}\\
+Only ~4 in placebo and ~1 in vaccine : very small difference.
+Unlike Dr. Salk's trial (33 vs. 115), the differences between the number of
+cases is very less, making it hard to draw any statistical conclusion.\\
+\textbf{2. Disobedience Bias:}\\
+If participants don’t follow protocol, the small number of cases becomes even
+less meaningful.
+\\\\
+\noindent \textbf{(C)} Recommend any modifications to the study design to
+better justify safety,
+referring to relevant statistical principles and historical precedents like
+the Salk vaccine trial. \\[0.2cm]
+Modifications which can be done are as follows:
+\begin{itemize}
+    \item We can increase the sample size, maybe like Salk's trial (~1.8
+          million) or at
+          least 100,000+ to detect both rare side effects and get reliable
+          efficacy
+          estimate.
+    \item Extend trial duration, e.g., to 1 year, so more disease cases appear
+          and trends are clearer.
+\end{itemize}
+
+\newpage
+
+\section*{Question 05}
+
+\noindent \textbf{(A)} Develop an appropriate hypothesis to test the
+effectiveness of the PoshanShakti program in reducing malnutrition in rural
+Indian schoolchildren.
+\\[0.2cm]
+The PoshanShakti program leads to greater improvements in children's
+nutritional status compared to the standard Mid-Day Meal scheme in rural Indian
+schools.
+\\\\
+\noindent\textbf{(B)} Which research framework (PICOT, PICO, PEO, PESTEL, or
+RE-AIM) would be
+most appropriate for this study? Justify your selection and explain how the
+elements of your chosen framework would apply to this specific case.
+\\[0.2cm]
+\textbf{RE-AIM}\\
+This framework evaluates health interventions across Reach, Effectiveness,
+Adoption,
+Implementation, and Maintenance — all crucial for implementation of a public
+program like
+PoshanShakti.
+\\\\
+\noindent\textbf{(C)} Recommend three specific data visualizations (charts or
+plots) that would
+effectively communicate the program's outcomes to Indian policymakers and
+stakeholders. For each, explain what variables would be plotted and how the
+visualization would help stakeholders understand the results.
+\\[0.2cm]
+Some visualizations that would help to communicate the program's outcome are as
+follows:
+\begin{itemize}
+    \item \textbf{Bar Chart:} A bar chart can be used to compare underweight
+          rates in both groups. This would highlight the nutritional
+          improvements from
+          the PoshanShakti program.
+    \item \textbf{Line Graph:} A line graph showing monthly attendance trends
+          would show how the program affects the attendance rates of the
+          students.
+    \item \textbf{Cost-effectiveness Scatter Plot:} A scatter plot of health
+          improvement versus cost per student would help evaluate how cost
+          effective the
+          program is.
+\end{itemize}
+
+\noindent\textbf{(F)}\\
+i) Identify two potential confounding variables that might affect the
+evaluation of
+this nutrition program in rural India.
+\begin{itemize}
+    \item \textbf{Food at home:}
+          Children's nutritional status is influenced not only by school meals
+          but
+          also by the quantity and quality of food they receive at home. If
+          families in
+          the intervention group have better access to nutritious food at home
+          compared
+          to those in the control group, the observed improvements might not be
+          solely
+          due to the PoshanShakti program.
+    \item \textbf{Access to local healthcare services:}
+          Regions with better functioning Primary Health Centers (PHCs) may
+          offer
+          additional support such as supplements or general healthcare that
+          could enhance
+          children's growth. If more intervention schools are located in areas
+          with
+          better health infrastructure, it could impact the results of the
+          program.
+\end{itemize}
+ii) For each confounding variable, explain how it might influence the results
+and
+propose a specific strategy to control for or mitigate its effects in the study
+design or analysis, considering the practical constraints of conducting
+research
+in rural India.
+\begin{itemize}
+    \item \textbf{Access to local healthcare services:}
+          Collect data on household food availability and quality through
+          surveys and control for it using statistical methods.
+    \item \textbf{Access to local healthcare services:}
+    We can note how close the nearby health centers are for each school. Then, while analyzing the results, we can consider this factor to make sure it doesn't affect the outcome unfairly. Another way is to choose control schools that have similar healthcare access as the intervention schools, so the comparison stays fair.
+\end{itemize}
+
+\end{document}
